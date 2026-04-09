@@ -1,0 +1,599 @@
+{
+  "index_patterns": ["logs-gdacs.events-*"],
+  "data_stream": {},
+  "priority": 200,
+  "template": {
+    "settings": {
+      "default_pipeline": "logs-gdacs.events@custom"
+    },
+    "mappings": {
+        "dynamic": "true",
+        "_data_stream_timestamp": {
+          "enabled": true
+        },
+        "dynamic_templates": [
+          {
+            "gdacs.affected_countries": {
+              "path_match": "gdacs.affected_countries.*",
+              "match_mapping_type": "string",
+              "mapping": {
+                "type": "keyword"
+              }
+            }
+          },
+          {
+            "ecs_timestamp": {
+              "match": "@timestamp",
+              "mapping": {
+                "ignore_malformed": false,
+                "type": "date"
+              }
+            }
+          },
+          {
+            "ecs_message_match_only_text": {
+              "path_match": [
+                "message",
+                "*.message"
+              ],
+              "unmatch_mapping_type": "object",
+              "mapping": {
+                "type": "match_only_text"
+              }
+            }
+          },
+          {
+            "ecs_non_indexed_keyword": {
+              "path_match": [
+                "*event.original",
+                "*gen_ai.agent.description"
+              ],
+              "mapping": {
+                "doc_values": false,
+                "index": false,
+                "type": "keyword"
+              }
+            }
+          },
+          {
+            "ecs_non_indexed_long": {
+              "path_match": "*.x509.public_key_exponent",
+              "mapping": {
+                "doc_values": false,
+                "index": false,
+                "type": "long"
+              }
+            }
+          },
+          {
+            "ecs_ip": {
+              "path_match": [
+                "ip",
+                "*.ip",
+                "*_ip"
+              ],
+              "match_mapping_type": "string",
+              "mapping": {
+                "type": "ip"
+              }
+            }
+          },
+          {
+            "ecs_wildcard": {
+              "path_match": [
+                "*.io.text",
+                "*.message_id",
+                "*registry.data.strings",
+                "*url.path"
+              ],
+              "unmatch_mapping_type": "object",
+              "mapping": {
+                "type": "wildcard"
+              }
+            }
+          },
+          {
+            "ecs_path_match_wildcard_and_match_only_text": {
+              "path_match": [
+                "*.body.content",
+                "*url.full",
+                "*url.original"
+              ],
+              "unmatch_mapping_type": "object",
+              "mapping": {
+                "fields": {
+                  "text": {
+                    "type": "match_only_text"
+                  }
+                },
+                "type": "wildcard"
+              }
+            }
+          },
+          {
+            "ecs_match_wildcard_and_match_only_text": {
+              "match": [
+                "*command_line",
+                "*stack_trace"
+              ],
+              "unmatch_mapping_type": "object",
+              "mapping": {
+                "fields": {
+                  "text": {
+                    "type": "match_only_text"
+                  }
+                },
+                "type": "wildcard"
+              }
+            }
+          },
+          {
+            "ecs_path_match_keyword_and_match_only_text": {
+              "path_match": [
+                "*.title",
+                "*.executable",
+                "*.name",
+                "*.working_directory",
+                "*.full_name",
+                "*.display_name",
+                "*file.path",
+                "*file.target_path",
+                "*os.full",
+                "*email.subject",
+                "*vulnerability.description",
+                "*user_agent.original"
+              ],
+              "unmatch_mapping_type": "object",
+              "mapping": {
+                "fields": {
+                  "text": {
+                    "type": "match_only_text"
+                  }
+                },
+                "type": "keyword"
+              }
+            }
+          },
+          {
+            "ecs_date": {
+              "path_match": [
+                "*.timestamp",
+                "*_timestamp",
+                "*.not_after",
+                "*.not_before",
+                "*.accessed",
+                "created",
+                "*.created",
+                "*.installed",
+                "*.creation_date",
+                "*.ctime",
+                "*.mtime",
+                "ingested",
+                "*.ingested",
+                "*.start",
+                "*.end",
+                "*.indicator.first_seen",
+                "*.indicator.last_seen",
+                "*.indicator.modified_at",
+                "*threat.enrichments.matched.occurred"
+              ],
+              "unmatch_mapping_type": "object",
+              "mapping": {
+                "type": "date"
+              }
+            }
+          },
+          {
+            "ecs_path_match_float": {
+              "path_match": [
+                "*.score.*",
+                "*_score*"
+              ],
+              "path_unmatch": "*.version",
+              "unmatch_mapping_type": "object",
+              "mapping": {
+                "type": "float"
+              }
+            }
+          },
+          {
+            "ecs_usage_double_scaled_float": {
+              "path_match": "*.usage",
+              "match_mapping_type": [
+                "double",
+                "long",
+                "string"
+              ],
+              "mapping": {
+                "scaling_factor": 1000,
+                "type": "scaled_float"
+              }
+            }
+          },
+          {
+            "ecs_geo_point": {
+              "path_match": "*.geo.location",
+              "mapping": {
+                "type": "geo_point"
+              }
+            }
+          },
+          {
+            "ecs_flattened": {
+              "path_match": [
+                "*structured_data",
+                "*exports",
+                "*imports"
+              ],
+              "match_mapping_type": "object",
+              "mapping": {
+                "type": "flattened"
+              }
+            }
+          },
+          {
+            "ecs_gen_ai_integers": {
+              "path_match": [
+                "*gen_ai.request.max_tokens",
+                "*gen_ai.usage.input_tokens",
+                "*gen_ai.usage.output_tokens",
+                "*gen_ai.request.choice.count",
+                "*gen_ai.request.seed"
+              ],
+              "mapping": {
+                "type": "integer"
+              }
+            }
+          },
+          {
+            "ecs_gen_ai_doubles": {
+              "path_match": [
+                "*gen_ai.request.temperature",
+                "*gen_ai.request.top_k",
+                "*gen_ai.request.frequency_penalty",
+                "*gen_ai.request.presence_penalty",
+                "*gen_ai.request.top_p"
+              ],
+              "mapping": {
+                "type": "double"
+              }
+            }
+          },
+          {
+            "all_strings_to_keywords": {
+              "match_mapping_type": "string",
+              "mapping": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          {
+            "strings_as_keyword": {
+              "match_mapping_type": "string",
+              "mapping": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          }
+        ],
+        "date_detection": false,
+        "properties": {
+          "@timestamp": {
+            "type": "date",
+            "ignore_malformed": false
+          },
+          "affected_facilities": {
+            "type": "nested",
+            "properties": {
+              "entity_geo_city_name": {
+                "type": "keyword"
+              },
+              "entity_geo_location": {
+                "type": "geo_point"
+              },
+              "entity_geo_region_name": {
+                "type": "keyword"
+              },
+              "entity_name": {
+                "type": "keyword"
+              },
+              "entity_station_number": {
+                "type": "keyword"
+              },
+              "entity_type": {
+                "type": "keyword"
+              }
+            }
+          },
+          "data_stream": {
+            "properties": {
+              "dataset": {
+                "type": "constant_keyword"
+              },
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "ecs": {
+            "properties": {
+              "version": {
+                "type": "keyword",
+                "ignore_above": 1024
+              }
+            }
+          },
+          "error": {
+            "properties": {
+              "message": {
+                "type": "match_only_text"
+              }
+            }
+          },
+          "event": {
+            "properties": {
+              "agent_id_status": {
+                "type": "keyword",
+                "ignore_above": 1024
+              },
+              "category": {
+                "type": "keyword",
+                "ignore_above": 1024
+              },
+              "dataset": {
+                "type": "keyword",
+                "ignore_above": 1024
+              },
+              "end": {
+                "type": "date"
+              },
+              "id": {
+                "type": "keyword",
+                "ignore_above": 1024
+              },
+              "ingested": {
+                "type": "date",
+                "format": "strict_date_time_no_millis||strict_date_optional_time||epoch_millis",
+                "ignore_malformed": false
+              },
+              "kind": {
+                "type": "keyword",
+                "ignore_above": 1024
+              },
+              "modified": {
+                "type": "date"
+              },
+              "module": {
+                "type": "keyword",
+                "ignore_above": 1024
+              },
+              "provider": {
+                "type": "keyword",
+                "ignore_above": 1024
+              },
+              "reference": {
+                "type": "keyword",
+                "ignore_above": 1024
+              },
+              "risk_score": {
+                "type": "float"
+              },
+              "severity": {
+                "type": "long"
+              },
+              "start": {
+                "type": "date"
+              },
+              "type": {
+                "type": "keyword",
+                "ignore_above": 1024
+              },
+              "url": {
+                "type": "keyword",
+                "ignore_above": 1024
+              }
+            }
+          },
+          "gdacs": {
+            "properties": {
+              "affected_area": {
+                "type": "geo_shape"
+              },
+              "affected_countries": {
+                "dynamic": "true",
+                "properties": {
+                  "countryname": {
+                    "type": "keyword"
+                  },
+                  "iso2": {
+                    "type": "keyword"
+                  },
+                  "iso3": {
+                    "type": "keyword"
+                  }
+                }
+              },
+              "affected_country_iso2": {
+                "type": "keyword",
+                "ignore_above": 1024
+              },
+              "affected_country_iso3": {
+                "type": "keyword",
+                "ignore_above": 1024
+              },
+              "affected_country_names": {
+                "type": "keyword",
+                "ignore_above": 1024
+              },
+              "alert_level": {
+                "type": "keyword",
+                "ignore_above": 1024
+              },
+              "alert_score": {
+                "type": "double"
+              },
+              "class": {
+                "type": "keyword",
+                "ignore_above": 1024
+              },
+              "country": {
+                "type": "keyword",
+                "ignore_above": 1024
+              },
+              "description": {
+                "type": "text"
+              },
+              "episode_alert_level": {
+                "type": "keyword",
+                "ignore_above": 1024
+              },
+              "episode_alert_score": {
+                "type": "double"
+              },
+              "episode_id": {
+                "type": "keyword",
+                "ignore_above": 1024
+              },
+              "event_id": {
+                "type": "keyword",
+                "ignore_above": 1024
+              },
+              "event_name": {
+                "type": "keyword",
+                "ignore_above": 1024
+              },
+              "event_type": {
+                "type": "keyword",
+                "ignore_above": 1024
+              },
+              "event_type_name": {
+                "type": "keyword",
+                "ignore_above": 1024
+              },
+              "glide": {
+                "type": "keyword",
+                "ignore_above": 1024
+              },
+              "html_description": {
+                "type": "text"
+              },
+              "icon": {
+                "type": "keyword",
+                "ignore_above": 1024
+              },
+              "is_current": {
+                "type": "boolean"
+              },
+              "is_temporary": {
+                "type": "boolean"
+              },
+              "iso3": {
+                "type": "keyword",
+                "ignore_above": 1024
+              },
+              "name": {
+                "type": "keyword",
+                "ignore_above": 1024
+              },
+              "normalized_severity": {
+                "type": "long"
+              },
+              "polygon_label": {
+                "type": "keyword",
+                "ignore_above": 1024
+              },
+              "severity": {
+                "properties": {
+                  "text": {
+                    "type": "keyword",
+                    "ignore_above": 1024
+                  },
+                  "unit": {
+                    "type": "keyword",
+                    "ignore_above": 1024
+                  },
+                  "value": {
+                    "type": "double"
+                  }
+                }
+              },
+              "severity_level": {
+                "type": "keyword"
+              },
+              "source": {
+                "type": "keyword",
+                "ignore_above": 1024
+              },
+              "source_id": {
+                "type": "keyword",
+                "ignore_above": 1024
+              },
+              "url": {
+                "properties": {
+                  "details": {
+                    "type": "keyword",
+                    "ignore_above": 1024
+                  },
+                  "geometry": {
+                    "type": "keyword",
+                    "ignore_above": 1024
+                  },
+                  "report": {
+                    "type": "keyword",
+                    "ignore_above": 1024
+                  }
+                }
+              }
+            }
+          },
+          "geo": {
+            "properties": {
+              "country_iso_code": {
+                "type": "keyword",
+                "ignore_above": 1024
+              },
+              "country_name": {
+                "type": "keyword",
+                "ignore_above": 1024
+              },
+              "location": {
+                "type": "geo_point"
+              },
+              "name": {
+                "type": "keyword",
+                "ignore_above": 1024
+              }
+            }
+          },
+          "host": {
+            "properties": {
+              "name": {
+                "type": "keyword",
+                "ignore_above": 1024
+              }
+            }
+          },
+          "input": {
+            "properties": {
+              "type": {
+                "type": "keyword",
+                "ignore_above": 1024
+              }
+            }
+          },
+          "message": {
+            "type": "match_only_text"
+          },
+          "tags": {
+            "type": "keyword",
+            "ignore_above": 1024
+          }
+        }
+      }
+    }
+  }

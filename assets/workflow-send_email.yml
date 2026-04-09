@@ -1,0 +1,35 @@
+name: Send email to MITRA facilities
+enabled: true
+description: Send an email to each affected MITRA facility and receiving MITRA facility
+triggers:
+  - type: manual
+inputs:
+  - name: facilities
+    type: string
+    required: true
+    description: "json array of facilities to email with their subject and message"
+steps:
+  - name: each_facility
+    type: foreach
+    foreach: "{{inputs.facilities | json_parse }}"
+    steps:
+      - name: example_email
+        type: console
+        with:
+          message: |
+            TO: "{{foreach.item.address}}"
+            SUBJECT: "{{foreach.item.subject}}"
+            BODY:
+              "{{foreach.item.message}}"
+
+              Please do not respond to this email. For any questions or concerns please reach out to disaster@example.com
+      # - name: send_email
+      #   type: email
+      #   connector-id: elastic-cloud-email
+      #   with:
+      #     to: "{{foreach.item.address}}"
+      #     subject: "{{foreach.item.subject}}"
+      #     message: |
+      #       "{{foreach.item.message}}"
+      #
+      #       Please do not respond to this email. For any questions or concerns please reach out to disaster@example.com

@@ -1,0 +1,8 @@
+id: mitra.send_email
+type: workflow
+description: Send an email to each affected MITRA facility and receiving MITRA facility
+tags:
+  - mitra
+configuration:
+  workflow_id: ""  # Will be auto-populated during import
+

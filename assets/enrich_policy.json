@@ -1,0 +1,13 @@
+  {
+    "geo_match": {
+      "indices": "mitra-facilities",
+      "match_field": "entity_geo_location",
+      "enrich_fields": [
+        "entity_name",
+        "entity_type",
+        "entity_station_number",
+        "entity_geo_city_name",
+        "entity_geo_region_name"
+      ]
+    }
+  }

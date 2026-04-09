@@ -1,0 +1,82 @@
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+    container_name: ${ELASTICSEARCH_CONTAINER_NAME}
+    volumes:
+      - dev-elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - 127.0.0.1:${ELASTICSEARCH_PORT}:9200
+    environment:
+      discovery.type: single-node
+      ELASTIC_PASSWORD: ${ELASTICSEARCH_PASSWORD}
+      xpack.security.enabled: true
+      xpack.security.http.ssl.enabled: false
+      xpack.license.self_generated.type: trial
+      xpack.ml.use_auto_machine_memory_percent: false
+      xpack.ml.max_machine_memory_percent: 10
+      xpack.ml.max_model_memory_limit: 2g
+      xpack.security.authc.api_key.enabled: true
+      xpack.security.authc.token.enabled: true
+      xpack.watcher.enabled: true
+      repositories.url.allowed_urls: https://example.com/*
+      path.repo: /tmp
+      ES_JAVA_OPTS: ${ELASTICSEARCH_JAVA_OPTS}
+    mem_limit: 2g
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl --output /dev/null --silent --head --fail -u elastic:${ELASTICSEARCH_PASSWORD} http://elasticsearch:9200",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+
+  kibana_settings:
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+    container_name: ${KIBANA_SETTINGS_CONTAINER_NAME}
+    restart: 'no'
+    command: >
+      bash -c '
+      echo "Setup the kibana_system password";
+      curl -sS --retry 5 --retry-delay 5 -u "elastic:${ELASTICSEARCH_PASSWORD}" -X POST http://elasticsearch:9200/_security/user/kibana_system/_password -d "{\"password\":\"${KIBANA_PASSWORD}\"}" -H "Content-Type: application/json"
+      '
+
+  kibana:
+    depends_on:
+      kibana_settings:
+        condition: service_completed_successfully
+    image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
+    container_name: ${KIBANA_CONTAINER_NAME}
+    volumes:
+      - dev-kibana:/usr/share/kibana/data
+    ports:
+      - 127.0.0.1:${KIBANA_PORT}:5601
+    environment:
+      SERVER_NAME: kibana
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+      ELASTICSEARCH_USERNAME: kibana_system
+      ELASTICSEARCH_PASSWORD: ${KIBANA_PASSWORD}
+      XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY: ${KIBANA_ENCRYPTION_KEY}
+      ELASTICSEARCH_PUBLICBASEURL: http://localhost:${ELASTICSEARCH_PORT}
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -s -w \"%{http_code}\" http://kibana:5601 | grep 302",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+
+volumes:
+  dev-elasticsearch:
+  dev-kibana:
+

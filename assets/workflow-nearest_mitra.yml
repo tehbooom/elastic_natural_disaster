@@ -1,0 +1,92 @@
+name: Nearest MITRA Facility
+enabled: true
+description: Find nearest MITRA facility to support specific facility
+triggers:
+  - type: manual
+inputs:
+  - name: lat
+    type: number
+    required: true
+    description: Latitude for facility
+  - name: lon
+    type: number
+    required: true
+    description: Longitude for facility
+  - name: radius
+    type: string
+    description: Radius to search for nearest facilities
+    required: false
+    default: "2500"
+steps:
+  - name: build_query
+    type: console
+    with:
+      message: |
+        {
+          "query": {
+            "bool": {
+              "filter": [
+                {
+                  "geo_shape": {
+                    "entity_geo_location": {
+                      "shape": {
+                        "type": "circle",
+                        "coordinates": [{{inputs.lon}}, {{inputs.lat}}],
+                        "radius": "5000km"
+                      },
+                      "relation": "intersects"
+                    }
+                  }
+                },
+                {
+                  "term": {
+                    "operational_status.keyword": "act"
+                  }
+                }
+              ]
+            }
+          },
+          "sort": [
+            {
+              "_geo_distance": {
+                "entity_geo_point": {
+                  "lat": {{inputs.lat}},
+                  "lon": {{inputs.lon}}
+                },
+                "order": "asc",
+                "unit": "km"
+              }
+            }
+          ],
+          "_source": [
+            "entity_name",
+            "entity_station_number",
+            "entity_geo_location",
+            "entity_geo_city_name",
+            "entity_geo_region_name",
+            "branch_of_service",
+            "housing_capacity",
+            "personnel_count",
+            "temporary_housing_capacity",
+            "available_assets.type",
+            "logistics_capabilities",
+            "mission_function_type",
+            "operational_status",
+            "is_joint_base",
+            "contact_email"
+          ],
+          "size": 50,
+          "script_fields": {
+            "available_capacity": {
+              "script": {
+                "source": "Math.max(0, doc['housing_capacity'].value - doc['personnel_count'].value)"
+              }
+            }
+          }
+        }
+  - name: search
+    type: elasticsearch.request
+    with:
+      method: POST
+      path: /mitra-facilities/_search
+      body: "${{ steps.build_query.output | json_parse }}"

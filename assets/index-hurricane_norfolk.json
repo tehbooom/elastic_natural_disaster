@@ -1,0 +1,121 @@
+{
+  "type": "Feature",
+  "bbox": [
+    -76.25,
+    36.88,
+    -76.25,
+    36.88
+  ],
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      -76.25,
+      36.88
+    ]
+  },
+  "properties": {
+    "eventtype": "TC",
+    "eventid": 1000001,
+    "episodeid": 2000001,
+    "eventname": "ELARA-26",
+    "glide": "TC-2026-000001-USA",
+    "name": "Tropical Cyclone ELARA-26",
+    "description": "Tropical Cyclone ELARA-26",
+    "htmldescription": "Red Tropical Cyclone ELARA-26 in United States Of America from: 07 Apr 2026 to: 10 Apr 2026. Landfall projected at Hampton Roads, Virginia.",
+    "icon": "https://www.gdacs.org/images/gdacs_icons/maps/Red/TC.png",
+    "iconoverall": "https://www.gdacs.org/images/gdacs_icons/maps/Red/TC.png",
+    "url": {
+      "geometry": "https://www.gdacs.org/gdacsapi/api/polygons/getgeometry?eventtype=TC&eventid=1000001&episodeid=2000001",
+      "report": "https://www.gdacs.org/report.aspx?eventid=1000001&episodeid=2000001&eventtype=TC",
+      "details": "https://www.gdacs.org/gdacsapi/api/events/geteventdata?eventtype=TC&eventid=1000001"
+    },
+    "alertlevel": "Red",
+    "alertscore": 3.5,
+    "episodealertlevel": "Red",
+    "episodealertscore": 3.5,
+    "istemporary": "false",
+    "iscurrent": "true",
+    "country": "United States Of America",
+    "fromdate": "2026-04-07T06:00:00",
+    "todate": "2026-04-10T18:00:00",
+    "datemodified": "2026-04-07T06:05:00",
+    "iso3": "USA",
+    "source": "NHC",
+    "sourceid": "AL012026",
+    "polygonlabel": "Centroid",
+    "Class": "Point_Centroid",
+    "affectedcountries": [
+      {
+        "iso2": "US",
+        "iso3": "USA",
+        "countryname": "United States Of America"
+      }
+    ],
+    "severitydata": {
+      "severity": 212.98,
+      "severitytext": "Category 4 Hurricane (maximum wind speed of 213 km/h)",
+      "severityunit": "km/h"
+    }
+  },
+  "polygon_geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -76.65,
+          36.7
+        ],
+        [
+          -76.6,
+          36.55
+        ],
+        [
+          -76.3,
+          36.5
+        ],
+        [
+          -75.95,
+          36.55
+        ],
+        [
+          -75.85,
+          36.7
+        ],
+        [
+          -75.85,
+          36.9
+        ],
+        [
+          -75.9,
+          37.05
+        ],
+        [
+          -76.0,
+          37.15
+        ],
+        [
+          -76.2,
+          37.22
+        ],
+        [
+          -76.45,
+          37.22
+        ],
+        [
+          -76.6,
+          37.1
+        ],
+        [
+          -76.65,
+          36.9
+        ],
+        [
+          -76.65,
+          36.7
+        ]
+      ]
+    ]
+  },
+  "polygon_class": "Poly_TC_WindField_Cat4",
+  "polygon_label": "Wind Field Category 4"
+}

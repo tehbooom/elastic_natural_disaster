@@ -1,0 +1,8 @@
+id: mitra.nearest_facility
+type: workflow
+description: Find nearest MITRA facility to support specific facility
+tags:
+  - mitra
+configuration:
+  workflow_id: ""  # Will be auto-populated during import
+

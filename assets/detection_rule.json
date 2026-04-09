@@ -1,0 +1,96 @@
+{
+  "name": "MITRA Facility Disaster Impact Alert",
+  "immutable": false,
+  "rule_source": {
+    "type": "internal"
+  },
+  "version": 1,
+  "revision": 13,
+  "enabled": false,
+  "interval": "1h",
+  "from": "now-1h",
+  "to": "now",
+  "description": "Alerts when a GDACS disaster event (wildfire, flood, earthquake, etc.) has an affected area that contains one or more facilities. This rule detects newly ingested GDACS events that have been enriched with matching facility data, indicating potential impact to operations.",
+  "tags": [],
+  "author": [],
+  "license": "",
+  "threat": [],
+  "investigation_fields": {
+    "field_names": [
+      "affected_facilities.entity_name",
+      "affected_facilities.entity_station_number",
+      "affected_facilities.entity_type",
+      "affected_facilities.entity_geo_city_name",
+      "affected_facilities.entity_geo_region_name"
+    ]
+  },
+  "related_integrations": [
+    {
+      "package": "gdacs",
+      "version": "^0.0.1"
+    }
+  ],
+  "required_fields": [],
+  "setup": "",
+  "false_positives": [],
+  "references": [],
+  "risk_score": 21,
+  "risk_score_mapping": [
+    {
+      "field": "gdacs.normalized_severity",
+      "operator": "equals",
+      "value": ""
+    }
+  ],
+  "severity": "low",
+  "severity_mapping": [
+    {
+      "field": "gdacs.severity_level",
+      "operator": "equals",
+      "severity": "low",
+      "value": "low"
+    },
+    {
+      "field": "gdacs.severity_level",
+      "operator": "equals",
+      "severity": "medium",
+      "value": "medium"
+    },
+    {
+      "field": "gdacs.severity_level",
+      "operator": "equals",
+      "severity": "high",
+      "value": "high"
+    },
+    {
+      "field": "gdacs.severity_level",
+      "operator": "equals",
+      "severity": "critical",
+      "value": "critical"
+    }
+  ],
+  "output_index": "",
+  "max_signals": 100,
+  "exceptions_list": [],
+  "actions": [
+    {
+      "id": "system-connector-.workflows",
+      "params": {
+        "subAction": "run",
+        "subActionParams": {
+          "workflowId": "REPLACE_WORKFLOW_ID",
+          "summaryMode": true
+        }
+      },
+      "action_type_id": ".workflows",
+      "uuid": "5d3bd06e-a923-48a4-8b1b-bf4120bb806c"
+    }
+  ],
+  "type": "query",
+  "language": "kuery",
+  "index": [
+    "logs-gdacs.events-*"
+  ],
+  "query": "affected_facilities: { entity_name: * }",
+  "filters": []
+}

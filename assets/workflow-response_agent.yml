@@ -1,0 +1,14 @@
+name: Natural Disaster Response Agent
+enabled: true
+description: On natural disaster alert will call our natural disaster agent to take action
+triggers:
+  - type: alert
+steps:
+  - name: start_convo
+    type: kibana.request
+    with:
+      method: "POST"
+      path: "/api/agent_builder/converse"
+      body:
+        agent_id: "mitra.response"
+        input: "New Natural Disaster Alert: {{ event.alerts | json }}"
